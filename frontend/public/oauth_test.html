@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini OAuth2 Test - Thoughtless</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 50px auto; 
+            padding: 20px; 
+            line-height: 1.6;
+        }
+        .status { 
+            padding: 15px; 
+            margin: 15px 0; 
+            border-radius: 8px; 
+            border: 2px solid;
+        }
+        .connected { 
+            background-color: #d4edda; 
+            color: #155724; 
+            border-color: #c3e6cb;
+        }
+        .disconnected { 
+            background-color: #f8d7da; 
+            color: #721c24; 
+            border-color: #f5c6cb;
+        }
+        button { 
+            padding: 12px 24px; 
+            margin: 8px; 
+            font-size: 16px; 
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { 
+            background-color: #6c757d; 
+            cursor: not-allowed; 
+        }
+        #debug-info { 
+            margin-top: 30px; 
+            padding: 20px; 
+            background-color: #f8f9fa; 
+            border-radius: 8px;
+        }
+        pre { 
+            background-color: white; 
+            padding: 10px; 
+            border-radius: 4px; 
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 Gemini OAuth2 Test</h1>
+    <p>Testing OAuth2 integration with the Thoughtless backend API.</p>
+    
+    <div id="status-display" class="status disconnected">
+        <strong>Status:</strong> Loading...
+    </div>
+    
+    <div id="oauth-controls">
+        <button id="connect-btn" onclick="connectGemini()">Connect to Gemini</button>
+        <button id="disconnect-btn" onclick="disconnectGemini()" disabled>Disconnect</button>
+        <button id="test-btn" onclick="testConnection()" disabled>Test Connection</button>
+    </div>
+
+    <div id="debug-info">
+        <h3>🔍 Debug Information</h3>
+        <pre id="debug-output">Initializing OAuth2 test...</pre>
+    </div>
+
+    <script>
+        const API_BASE = 'https://thoughtlessapi-m646gpqtna-uc.a.run.app';
+        
+        // Debug logging function
+        function debugLog(message) {
+            const timestamp = new Date().toISOString();
+            const output = document.getElementById('debug-output');
+            output.textContent += `${timestamp}: ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+            console.log(message);
+        }
+
+        // Update status display
+        function updateStatus(connected, message) {
+            const statusDiv = document.getElementById('status-display');
+            const connectBtn = document.getElementById('connect-btn');
+            const disconnectBtn = document.getElementById('disconnect-btn');
+            const testBtn = document.getElementById('test-btn');
+            
+            if (connected) {
+                statusDiv.className = 'status connected';
+                statusDiv.innerHTML = `<strong>Status:</strong> ✅ Connected - ${message}`;
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                testBtn.disabled = false;
+            } else {
+                statusDiv.className = 'status disconnected';
+                statusDiv.innerHTML = `<strong>Status:</strong> ❌ Disconnected - ${message}`;
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                testBtn.disabled = true;
+            }
+        }
+
+        // Check initial connection status
+        async function checkStatus() {
+            try {
+                debugLog('Checking OAuth2 connection status...');
+                const response = await fetch(`${API_BASE}/oauth/status`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                debugLog(`Status response: ${JSON.stringify(data, null, 2)}`);
+                
+                if (data.connected) {
+                    updateStatus(true, 'Gemini OAuth2 token found');
+                } else {
+                    updateStatus(false, 'No OAuth2 token found');
+                }
+            } catch (error) {
+                debugLog(`Error checking status: ${error.message}`);
+                updateStatus(false, 'Error checking connection');
+            }
+        }
+
+        // Connect to Gemini
+        async function connectGemini() {
+            try {
+                debugLog('Starting Gemini OAuth2 connection...');
+                
+                // Get OAuth2 config
+                const configResponse = await fetch(`${API_BASE}/oauth/config`);
+                const config = await configResponse.json();
+                debugLog(`OAuth2 config: ${JSON.stringify(config, null, 2)}`);
+                
+                // Build OAuth2 URL
+                const params = new URLSearchParams({
+                    client_id: config.client_id,
+                    redirect_uri: config.redirect_uri,
+                    response_type: 'code',
+                    scope: config.scope,
+                    access_type: 'offline',
+                    prompt: 'consent'
+                });
+                
+                const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+                debugLog(`Opening OAuth2 URL: ${authUrl}`);
+                
+                // Open OAuth2 window
+                window.open(authUrl, 'oauth', 'width=500,height=600');
+                
+            } catch (error) {
+                debugLog(`Error starting OAuth2: ${error.message}`);
+                updateStatus(false, 'OAuth2 connection failed');
+            }
+        }
+
+        // Disconnect from Gemini
+        async function disconnectGemini() {
+            try {
+                debugLog('Disconnecting from Gemini...');
+                
+                const response = await fetch(`${API_BASE}/oauth/disconnect`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                debugLog(`Disconnect response: ${JSON.stringify(data, null, 2)}`);
+                
+                updateStatus(false, 'Successfully disconnected');
+                
+            } catch (error) {
+                debugLog(`Error disconnecting: ${error.message}`);
+            }
+        }
+
+        // Test the connection
+        async function testConnection() {
+            try {
+                debugLog('Testing Gemini connection...');
+                
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        provider: 'gemini',
+                        model: 'gemini-pro',
+                        message: 'Hello! This is a test message from the OAuth2 test page.'
+                    })
+                });
+                
+                const data = await response.json();
+                debugLog(`Test response: ${JSON.stringify(data, null, 2)}`);
+                
+                if (data.response) {
+                    updateStatus(true, 'Connection test successful!');
+                } else {
+                    updateStatus(false, 'Connection test failed');
+                }
+                
+            } catch (error) {
+                debugLog(`Error testing connection: ${error.message}`);
+                updateStatus(false, 'Connection test error');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('OAuth2 test page loaded');
+            checkStatus();
+        });
+
+        // Listen for OAuth2 completion (if we implement postMessage)
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'oauth_complete') {
+                debugLog('OAuth2 flow completed');
+                checkStatus();
+            }
+        });
+    </script>
+</body>
+</html>
