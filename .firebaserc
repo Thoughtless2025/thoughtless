@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "thoughtlessdatalayer"
-  }
+    "default": "thoughtless-v2"
+  },
+  "targets": {},
+  "etags": {}
 }
