@@ -12,9 +12,9 @@
 **User Roles:** Public (view), Supporters (view+comment), Contributors (create+contribute), Admin (manage users)
 
 ## Current Architecture ✅
-- **Firebase Project:** `thoughtlessdatalayer`
-- **API Endpoint:** `https://thoughtlessapi-m646gpqtna-uc.a.run.app`
-- **Backend:** Modular Express.js on Firebase Functions
+- **Firebase Project:** `thoughtlessdatalayer` (Blaze Plan)
+- **API Endpoint:** `https://us-central1-thoughtlessdatalayer.cloudfunctions.net/thoughtlessapi`
+- **Backend:** Modular Express.js on Firebase Functions (2nd Gen)
 - **Security:** Firebase Auth + encrypted credential storage
 - **Gemini Integration:** OAuth2 authentication working ✅
 
@@ -35,7 +35,7 @@ frontend/
 ```
 
 ## Working API Endpoints
-**Base URL:** `https://thoughtlessapi-m646gpqtna-uc.a.run.app`
+**Base URL:** `https://us-central1-thoughtlessdatalayer.cloudfunctions.net/thoughtlessapi`
 
 **Database:** `/createChat`, `/updateChat/:chatId`, `/addMessage`, `/getChatList`, `/getChat/:chatId`
 **Auth:** `/health`, `/user-status`, `/setup-profile`, `/store-keys`  
@@ -50,15 +50,15 @@ frontend/
 ```
 
 ## Immediate Next Steps
-1. **Test OAuth2 Flow:** Deploy test HTML page to Firebase Hosting
-2. **Add Claude Adapter:** Create adaptors/claude.js  
-3. **Frontend Integration:** Connect components to web/mobile apps
+1. **Add Claude Adapter:** Create adaptors/claude.js  
+2. **Frontend Integration:** Connect components to web/mobile apps
 
 ## Development Status
-- ✅ **Deployed:** Backend API fully functional
+- ✅ **Deployed:** Backend API placeholder deployed
 - ✅ **Gemini:** OAuth2 integration complete
-- ⏳ **Testing:** OAuth2 flow verification needed
+- ✅ **Testing:** OAuth2 flow verification successful
+- ✅ **Infrastructure:** Upgraded to Blaze plan with 2nd Gen Functions
 - ⏳ **Claude:** Adapter pending
 - ⏳ **Frontend:** Integration pending
 
-Last Updated: 2025-08-17
+Last Updated: 2025-08-18
