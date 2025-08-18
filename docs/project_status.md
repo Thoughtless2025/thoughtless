@@ -56,9 +56,23 @@ frontend/
 ## Development Status
 - ✅ **Deployed:** Backend API placeholder deployed
 - ✅ **Gemini:** OAuth2 integration complete
-- ✅ **Testing:** OAuth2 flow verification successful
+- ❌ **Testing:** OAuth2 flow verification blocked by "Failed to fetch" error
 - ✅ **Infrastructure:** Upgraded to Blaze plan with 2nd Gen Functions
 - ⏳ **Claude:** Adapter pending
 - ⏳ **Frontend:** Integration pending
+
+## Known Issues
+### "Failed to fetch" error in browser
+**Description:** The `oauth_test.html` page is unable to make requests to the backend API, resulting in a "Failed to fetch" error in the browser's console. This issue occurs despite the fact that the backend API is deployed, publicly accessible, and has a permissive CORS policy. The issue has been reproduced in multiple browsers and on multiple networks.
+
+**Troubleshooting Steps Taken:**
+- Recreated and deployed the backend API multiple times.
+- Upgraded the Firebase project to the Blaze plan and enabled 2nd Gen Cloud Functions.
+- Made the backend API publicly accessible using `gcloud`.
+- Configured a specific CORS policy on the backend.
+- Verified that the backend API is accessible from the command line using `curl`.
+- Redeployed the frontend application.
+
+**Conclusion:** The issue is likely not with the code, but with the environment (e.g., a project configuration issue, a network issue, or a browser issue). Further investigation is needed to identify the root cause.
 
 Last Updated: 2025-08-18
